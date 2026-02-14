@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: argocd-server
+  namespace: argocd
+spec:
+  template:
+    spec:
+      initContainers:
+        - name: booking-extension
+          image: argocd-book-plugin:latest
+          command: ["/bin/sh", "-c"]
+          args: ["cp /ui/extension-booking.js /extensions/"]
+          volumeMounts:
+            - name: extensions
+              mountPath: /extensions
+      containers:
+        - name: argocd-server
+          volumeMounts:
+            - name: extensions
+              mountPath: /tmp/extensions
+      volumes:
+        - name: extensions
+          emptyDir: {}
